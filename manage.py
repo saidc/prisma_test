@@ -8,6 +8,7 @@ from typing import List, Optional
 PROJECT_DIR = os.path.dirname(os.path.abspath(__file__))
 COMPOSE_FILE = os.path.join(PROJECT_DIR, "docker-compose.yml")
 ENV_FILE = os.path.join(PROJECT_DIR, ".env")
+ENV_EXAMPLE_FILE = os.path.join(PROJECT_DIR, ".env.example")
 
 def _run(cmd: List[str], title: str, check: bool = True) -> None:
     print(f"\n=== {title} ===")
@@ -26,9 +27,23 @@ def _ensure_env() -> None:
     if not os.path.exists(ENV_FILE):
         raise SystemExit("Falta .env. Crea uno desde .env.example (cp .env.example .env).")
 
+def copiar_en(origen, destino):
+    # Verificar si el archivo origen existe
+    if os.path.exists(origen):
+        try:
+            shutil.copyfile(origen, destino)
+            print(f"✅ Archivo '{destino}' creado exitosamente.")
+        except Exception as e:
+            print(f"❌ Error al copiar el archivo: {e}")
+    else:
+        print(f"⚠️ El archivo '{origen}' no existe en el directorio actual.")
+
 def up(build: bool) -> None:
     _ensure_tools()
     _ensure_env()
+
+    # Asegurarse de que el archivo .env exista
+    copiar_en(ENV_EXAMPLE_FILE, ENV_FILE)
 
     cmd = ["docker", "compose", "--env-file", ENV_FILE, "-f", COMPOSE_FILE, "up", "-d"]
     if build:
