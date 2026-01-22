@@ -1,0 +1,8 @@
+node_modules
+.env
+.env.*
+!/env/.active.env
+db_data
+dist
+logs
+.DS_Store
