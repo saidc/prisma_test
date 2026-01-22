@@ -2,6 +2,13 @@ import subprocess
 import sys
 import argparse
 
+def show_status(env_file):
+    """Ejecuta docker compose ps para mostrar el estado actual."""
+    print("\n--- Estado actual de los contenedores ---")
+    comando = ["docker", "compose", "--env-file", env_file, "ps", "-a"]
+    subprocess.run(comando, text=True)
+    print("------------------------------------------\n")
+    
 def docker_compose_up(env_file):
     """Levanta el ambiente con build y en modo detached."""
     comando_docker = [
@@ -65,10 +72,13 @@ def main():
     # Lógica para inicializar
     if args.init == "dev":
         docker_compose_up(env_path)
-    
+        # Mostramos el estado final (debería salir la lista de servicios corriendo)
+        show_status(env_file)
     # Lógica para resetear (down-all)
     elif args.down_all == "dev":
         docker_compose_down_all(env_path)
+        # Mostramos el estado final (debería salir la lista vacía)
+        show_status(env_file)
     
     else:
         print("No se ha especificado una acción válida o el ambiente es incorrecto.")
@@ -82,4 +92,4 @@ if __name__ == "__main__":
 #  Para inicializar el ambiente de desarrollo, ejecuta:
 #   sudo python3 build_script.py --init dev
 #  Para limpiar todo el ambiente de desarrollo, ejecuta:
-#   python3 manage_script.py --down-all dev
+#   sudo python3 build_script.py --down-all dev
