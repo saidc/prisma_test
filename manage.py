@@ -42,9 +42,6 @@ def up(build: bool) -> None:
     _ensure_tools()
     _ensure_env()
 
-    # Asegurarse de que el archivo .env exista
-    copiar_en(ENV_EXAMPLE_FILE, ENV_FILE)
-
     cmd = ["docker", "compose", "--env-file", ENV_FILE, "-f", COMPOSE_FILE, "up", "-d"]
     if build:
         cmd.append("--build")
@@ -124,6 +121,9 @@ def main() -> None:
 
     args = p.parse_args()
 
+    # Asegurarse de que el archivo .env exista
+    copiar_en(ENV_EXAMPLE_FILE, ENV_FILE)
+    
     if args.cmd == "up":
         up(build=args.build)
     elif args.cmd == "down":
@@ -160,7 +160,7 @@ if __name__ == "__main__":
     ### 2) Levantar el stack (build + up)
 
         ```bash
-        python3 manage.py up --build
+        sudo python3 manage.py up --build
         ```
 
         Prueba:
