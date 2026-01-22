@@ -1,73 +1,76 @@
-# Node + Express + PostgreSQL + Prisma + Docker Compose (base)
+# Prisma + Docker (Node/Express + PostgreSQL)
 
-Starter para **desarrollo con Docker Compose** (DB + API + Nginx).
+Proyecto base para:
+- API Node.js/Express
+- Prisma ORM
+- PostgreSQL
+- Docker Compose (API + DB + Prisma Studio)
+
+Incluye CRUD completo de `User` y una migración inicial (ver `prisma/migrations`). Al levantar el stack, el contenedor ejecuta:
+
+- `prisma migrate deploy`
+- `prisma generate`
+- `node index.js`
 
 ## Requisitos
-- Docker + Docker Compose (plugin)
+- Docker + Docker Compose
+- Puertos libres: 3000 (API), 5432 (Postgres), 5555 (Studio)
 
-## Estructura
-```
-.
-├─ .env.example
-├─ docker-compose.yml
-├─ env/
-│  └─ .active.env
-├─ nginx/
-│  └─ templates/
-│     └─ default.conf.template
-└─ app/
-   ├─ Dockerfile
-   ├─ package.json
-   ├─ prisma/
-   │  ├─ schema.prisma
-   │  └─ seed.js
-   └─ src/
-      ├─ app.js
-      └─ server.js
-```
-
-## 1) Variables de entorno (importante)
-Docker Compose **NO** usa `env_file:` para interpolar variables dentro de `docker-compose.yml`.
-Para evitar warnings (como los que te salieron) usa **una** opción:
-
-- Opción A (recomendada): crea `.env` en la raíz:
-  ```bash
-  cp .env.example .env
-  ```
-- Opción B: ejecuta Compose indicando el archivo:
-  ```bash
-  docker compose --env-file ./env/.active.env up -d --build
-  ```
-
-## 2) Levantar servicios
+## 1) Variables de entorno
 ```bash
-# Si usas .env en la raíz
-docker compose up -d --build
-
-# O si usas env/.active.env
-docker compose --env-file ./env/.active.env up -d --build
+cp .env.example .env
 ```
 
-Logs:
+## 2) Levantar
 ```bash
-docker compose logs -f app
+python3 manage.py up --build
 ```
 
-API:
-- vía Nginx: `http://localhost:8080/health`
+## 3) Probar CRUD
 
-## 3) Inicializar Prisma (migraciones + generate + seed)
+Crear:
 ```bash
-docker compose exec app sh -lc "npx prisma migrate dev --name init"
-docker compose exec app sh -lc "npx prisma generate"
-docker compose exec app sh -lc "npx prisma db seed"
+curl -X POST http://localhost:3000/users \
+  -H "Content-Type: application/json" \
+  -d '{"email":"test@example.com","name":"Test User"}'
 ```
 
-## 4) Endpoints de prueba
-- `GET /health`
-- `GET /users`
-- `POST /users` con body `{ "email": "x@y.com", "name": "..." }`
+Listar:
+```bash
+curl http://localhost:3000/users
+```
 
-## Nota sobre `npm ci`
-Este starter usa `npm ci` **si existe** `package-lock.json`. Si no hay lockfile, el Dockerfile cae a `npm install`.
-Lo recomendado es **versionar `package-lock.json`** para builds determinísticos.
+Actualizar:
+```bash
+curl -X PUT http://localhost:3000/users/1 \
+  -H "Content-Type: application/json" \
+  -d '{"name":"Nuevo Nombre"}'
+```
+
+Eliminar:
+```bash
+curl -X DELETE http://localhost:3000/users/1
+```
+
+## 4) Prisma Studio
+```bash
+python3 manage.py studio
+```
+
+Abrir: `http://localhost:5555`
+
+## 5) Bajar / limpiar
+Bajar:
+```bash
+python3 manage.py down
+```
+
+Bajar y borrar datos:
+```bash
+python3 manage.py down --volumes
+```
+
+Reset total:
+```bash
+python3 manage.py nuke
+```

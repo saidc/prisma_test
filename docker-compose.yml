@@ -1,66 +1,59 @@
 services:
-  nginx:
-    image: nginx:1.27-alpine
-    depends_on:
-      - app
-    ports:
-      - "8080:80"
-    env_file:
-      - ./env/.active.env
-    volumes:
-      - ./nginx/templates:/etc/nginx/templates:ro
-    networks:
-      - edge_net
+  db:
+    image: postgres:15
+    container_name: prisma_basic_db
     restart: unless-stopped
-
-  app:
-    build:
-      context: ./app
-      dockerfile: Dockerfile
-      target: dev
-    working_dir: /app
-    env_file:
-      - ./env/.active.env
     environment:
-      NODE_ENV: ${NODE_ENV:-development}
-      PORT: ${PORT:-3000}
-      # OJO: esta interpolación usa .env o --env-file, no env_file.
-      DATABASE_URL: ${DATABASE_URL:-postgresql://appuser:appsecret@db:5432/appdb?schema=public}
+      POSTGRES_DB: ${POSTGRES_DB:-app}
+      POSTGRES_USER: ${POSTGRES_USER:-app}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-app}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
     volumes:
-      - ./app:/app
-      - /app/node_modules
-    expose:
-      - "3000"
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-app} -d ${POSTGRES_DB:-app}"]
+      interval: 5s
+      timeout: 2s
+      retries: 20
+    networks:
+      - prisma-network
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: prisma_basic_api
+    restart: unless-stopped
+    environment:
+      PORT: 3000
+      DATABASE_URL: ${DATABASE_URL}
+    ports:
+      - "${APP_PORT:-3000}:3000"
     depends_on:
       db:
         condition: service_healthy
     networks:
-      - edge_net
-      - app_net
-    restart: unless-stopped
+      - prisma-network
 
-  db:
-    image: postgres:16
-    environment:
-      POSTGRES_USER: ${POSTGRES_USER:-appuser}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-appsecret}
-      POSTGRES_DB: ${POSTGRES_DB:-appdb}
+  studio:
+    image: node:22-alpine
+    working_dir: /usr/src/app
     volumes:
-      - db_data:/var/lib/postgresql/data
+      - .:/usr/src/app
+    command: sh -lc "npm install && npx prisma studio --port 5555 --browser none"
+    ports:
+      - "${STUDIO_PORT:-5555}:5555"
+    environment:
+      DATABASE_URL: ${DATABASE_URL}
+    depends_on:
+      db:
+        condition: service_healthy
     networks:
-      - app_net
-    restart: unless-stopped
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-appuser} -d ${POSTGRES_DB:-appdb}"]
-      interval: 10s
-      timeout: 5s
-      retries: 10
-
-volumes:
-  db_data:
+      - prisma-network
 
 networks:
-  edge_net:
-    driver: bridge
-  app_net:
-    driver: bridge
+  prisma-network:
+
+volumes:
+  postgres_data:
