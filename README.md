@@ -1,14 +1,14 @@
 # Node + Express + PostgreSQL + Prisma + Docker Compose (base)
 
-Este starter está pensado para **desarrollo local con Docker Compose** y listo para evolucionar a producción.
+Starter para **desarrollo con Docker Compose** (DB + API + Nginx).
 
 ## Requisitos
 - Docker + Docker Compose (plugin)
-- (Opcional) Node.js local si quieres ejecutar comandos sin entrar al contenedor
 
 ## Estructura
 ```
 .
+├─ .env.example
 ├─ docker-compose.yml
 ├─ env/
 │  └─ .active.env
@@ -26,60 +26,48 @@ Este starter está pensado para **desarrollo local con Docker Compose** y listo 
       └─ server.js
 ```
 
-## 1) Configurar variables de entorno
-Copia y ajusta el archivo:
+## 1) Variables de entorno (importante)
+Docker Compose **NO** usa `env_file:` para interpolar variables dentro de `docker-compose.yml`.
+Para evitar warnings (como los que te salieron) usa **una** opción:
 
-- `env/.active.env` (ya viene un ejemplo)
+- Opción A (recomendada): crea `.env` en la raíz:
+  ```bash
+  cp .env.example .env
+  ```
+- Opción B: ejecuta Compose indicando el archivo:
+  ```bash
+  docker compose --env-file ./env/.active.env up -d --build
+  ```
 
-> **Nota Prisma 7+:** `migrate dev` ya no ejecuta `generate` ni `seed` automáticamente; se ejecutan explícitamente con los comandos indicados abajo. (ver docs oficiales del CLI)  
-
-## 2) Levantar servicios (DB + API)
+## 2) Levantar servicios
 ```bash
+# Si usas .env en la raíz
 docker compose up -d --build
+
+# O si usas env/.active.env
+docker compose --env-file ./env/.active.env up -d --build
 ```
 
-Ver logs:
+Logs:
 ```bash
 docker compose logs -f app
 ```
 
-La API quedará en: `http://localhost:8080` (por Nginx) o `http://localhost:3000` si expones el puerto del app.
+API:
+- vía Nginx: `http://localhost:8080/health`
 
 ## 3) Inicializar Prisma (migraciones + generate + seed)
-Ejecuta dentro del servicio `app`:
-
 ```bash
-# 3.1 crear/aplicar migración inicial (DEV)
 docker compose exec app sh -lc "npx prisma migrate dev --name init"
-
-# 3.2 generar Prisma Client (DEV/PROD)
 docker compose exec app sh -lc "npx prisma generate"
-
-# 3.3 seed (opcional)
 docker compose exec app sh -lc "npx prisma db seed"
 ```
 
-### Reset completo (DEV)
-```bash
-docker compose exec app sh -lc "npx prisma migrate reset"
-```
-
 ## 4) Endpoints de prueba
-- `GET /health`  -> healthcheck simple
-- `GET /users`   -> lista usuarios
-- `POST /users`  -> crea usuario `{ "email": "...", "name": "..." }`
+- `GET /health`
+- `GET /users`
+- `POST /users` con body `{ "email": "x@y.com", "name": "..." }`
 
-## 5) Parar y limpiar
-```bash
-docker compose down
-```
-
-Borrar volumen de DB (⚠️ elimina datos):
-```bash
-docker compose down -v
-```
-
-## Producción (idea rápida)
-- Construir con target `prod`
-- Usar `prisma migrate deploy` en el arranque (o job aparte)
-- Configurar TLS/Certbot en Nginx según tu infraestructura
+## Nota sobre `npm ci`
+Este starter usa `npm ci` **si existe** `package-lock.json`. Si no hay lockfile, el Dockerfile cae a `npm install`.
+Lo recomendado es **versionar `package-lock.json`** para builds determinísticos.
