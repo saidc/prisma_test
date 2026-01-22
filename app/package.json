@@ -5,7 +5,7 @@
   "type": "commonjs",
   "main": "src/server.js",
   "scripts": {
-    "dev": "nodemon --watch src --watch prisma --exec node src/server.js",
+    "dev": "node src/server.js",
     "start": "node src/server.js",
     "prisma:generate": "prisma generate",
     "db:migrate:dev": "prisma migrate dev",

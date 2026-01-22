@@ -1,65 +1,85 @@
-import subprocess  # Importa el módulo para ejecutar procesos del sistema
-import sys         # Importa el módulo para manejo de errores y salida del sistema
-import argparse    # Importa el módulo para gestionar argumentos de línea de comandos
+import subprocess
+import sys
+import argparse
 
 def docker_compose_up(env_file):
-    # Definimos el comando de docker compose que solicitaste originalmente
+    """Levanta el ambiente con build y en modo detached."""
     comando_docker = [
-        "docker", "compose", # Usamos 'docker compose' en lugar de 'docker-compose'
-        "--env-file", env_file, # Especificamos el archivo de entorno
-        "up", "-d", "--build" # Comando para levantar los servicios en modo detached y construir imágenes
+        "docker", "compose",
+        "--env-file", env_file,
+        "up", "-d", "--build"
     ]
     
     try:
-        print("--- Iniciando pasos del ambiente DEV ---")
-        print(f"Ejecutando comando: {' '.join(comando_docker)}")
-        
-        # Ejecutamos el comando y esperamos a que termine
+        print(f"--- Iniciando despliegue de ambiente: {env_file} ---")
         subprocess.run(comando_docker, check=True, text=True)
-        
-        print("--- Ambiente DEV desplegado correctamente ---")
-        
+        print("--- Ambiente desplegado correctamente ---")
     except subprocess.CalledProcessError as e:
-        # Si Docker devuelve un error, lo capturamos aquí
-        print(f"Error al ejecutar Docker en ambiente dev: {e}", file=sys.stderr)
+        print(f"Error al levantar Docker: {e}", file=sys.stderr)
     except FileNotFoundError:
-        # Si Docker no está instalado en el sistema
         print("Error: El comando 'docker' no fue encontrado.", file=sys.stderr)
 
-def init_dev():
+def docker_compose_down_all(env_file):
     """
-    Esta función se encarga de ejecutar los pasos específicos 
-    para el ambiente de desarrollo (dev).
+    Baja los servicios y elimina TODO:
+    -v: Volúmenes
+    --rmi all: Todas las imágenes utilizadas
+    --remove-orphans: Contenedores huérfanos
     """
-    docker_compose_up("./env/.active.env")
+    comando_docker = [
+        "docker", "compose",
+        "--env-file", env_file,
+        "down",
+        "-v",            # Elimina volúmenes
+        "--rmi", "all",  # Elimina todas las imágenes del archivo compose
+        "--remove-orphans" # Elimina contenedores no definidos en el archivo actual
+    ]
+    
+    try:
+        print(f"--- Limpiando ambiente (Down All): {env_file} ---")
+        subprocess.run(comando_docker, check=True, text=True)
+        print("--- El sistema ha quedado en cero (volúmenes, redes e imágenes eliminados) ---")
+    except subprocess.CalledProcessError as e:
+        print(f"Error al limpiar Docker: {e}", file=sys.stderr)
 
 def main():
-    # 1. Configuramos argparse para recibir el argumento --init
     parser = argparse.ArgumentParser(description="Script de gestión de ambientes.")
     
-    # Añadimos la variable 'init' como argumento de entrada
+    # Argumento para inicializar
     parser.add_argument(
         "--init", 
         type=str, 
         help="Define el ambiente a inicializar (ej: dev)"
     )
 
-    # 2. Leemos los argumentos pasados al ejecutar el script
+    # Argumento para limpieza total
+    parser.add_argument(
+        "--down-all",
+        type=str,
+        help="Baja y elimina todo rastro del ambiente (ej: dev)"
+    )
+
     args = parser.parse_args()
+    env_path = "./env/.active.env"
 
-    # 3. Guardamos el valor en una variable local para mayor claridad
-    init = args.init
-
-    # 4. Lógica de validación: si init es 'dev', ejecutamos la función
-    if init == "dev":
-        init_dev()
+    # Lógica para inicializar
+    if args.init == "dev":
+        docker_compose_up(env_path)
+    
+    # Lógica para resetear (down-all)
+    elif args.down_all == "dev":
+        docker_compose_down_all(env_path)
+    
     else:
-        # Si no es 'dev', el script no hace nada y avisa al usuario
-        print(f"Valor de --init: '{init}'. No se realizará ninguna acción.")
+        print("No se ha especificado una acción válida o el ambiente es incorrecto.")
+        print("Uso: python3 manage_script.py --init dev  O  python3 manage_script.py --down-all dev")
 
-# Punto de entrada del programa
 if __name__ == "__main__":
     main()
 
+
 # Ejemplo de uso:
-#   python build_script.py --init dev
+#  Para inicializar el ambiente de desarrollo, ejecuta:
+#   sudo python3 build_script.py --init dev
+#  Para limpiar todo el ambiente de desarrollo, ejecuta:
+#   python3 manage_script.py --down-all dev
