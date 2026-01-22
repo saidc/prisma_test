@@ -1,7 +1,8 @@
 # syntax=docker/dockerfile:1
 
-FROM node:24-alpine AS base
+FROM node:20-alpine AS base
 WORKDIR /app
+
 # Paquetes útiles para algunas dependencias nativas (si las llegas a usar)
 RUN apk add --no-cache libc6-compat
 
@@ -23,6 +24,7 @@ FROM base AS prod
 ENV NODE_ENV=production
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
+
 # Prisma Client se genera en build (puedes moverlo a pipeline CI/CD)
 RUN npx prisma generate
 EXPOSE 3000
