@@ -31,7 +31,7 @@ def init_dev():
     Esta función se encarga de ejecutar los pasos específicos 
     para el ambiente de desarrollo (dev).
     """
-    docker_compose_up(".active.env")
+    docker_compose_up("./env/.active.env")
 
 def main():
     # 1. Configuramos argparse para recibir el argumento --init
@@ -60,3 +60,6 @@ def main():
 # Punto de entrada del programa
 if __name__ == "__main__":
     main()
+
+# Ejemplo de uso:
+#   python build_script.py --init dev
