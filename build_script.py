@@ -8,7 +8,7 @@ def show_status(env_file):
     comando = ["docker", "compose", "--env-file", env_file, "ps", "-a"]
     subprocess.run(comando, text=True)
     print("------------------------------------------\n")
-    
+
 def docker_compose_up(env_file):
     """Levanta el ambiente con build y en modo detached."""
     comando_docker = [
@@ -73,12 +73,12 @@ def main():
     if args.init == "dev":
         docker_compose_up(env_path)
         # Mostramos el estado final (debería salir la lista de servicios corriendo)
-        show_status(env_file)
+        show_status(env_path)
     # Lógica para resetear (down-all)
     elif args.down_all == "dev":
         docker_compose_down_all(env_path)
         # Mostramos el estado final (debería salir la lista vacía)
-        show_status(env_file)
+        show_status(env_path)
     
     else:
         print("No se ha especificado una acción válida o el ambiente es incorrecto.")
@@ -90,6 +90,6 @@ if __name__ == "__main__":
 
 # Ejemplo de uso:
 #  Para inicializar el ambiente de desarrollo, ejecuta:
-#   sudo python3 build_script.py --init dev
+#   ->  sudo python3 build_script.py --init dev
 #  Para limpiar todo el ambiente de desarrollo, ejecuta:
-#   sudo python3 build_script.py --down-all dev
+#   ->  sudo python3 build_script.py --down-all dev

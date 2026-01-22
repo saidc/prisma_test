@@ -6,9 +6,9 @@ RUN apk add --no-cache libc6-compat
 
 # ---- deps ----
 FROM base AS deps
-COPY package.json package-lock.json* ./
+COPY package.json ./
 # npm ci requiere lockfile. Si no existe, hace npm install (ideal: commitear package-lock.json)
-RUN if [ -f package-lock.json ]; then npm ci; else npm install; fi
+RUN npm install
 
 # ---- dev ----
 FROM base AS dev
