@@ -1,0 +1,15 @@
+# --- archivos y carpetas del proyecto ---
+certbot/
+estructura.py
+project_paths.txt
+project_files_with_contents.txt
+# --- env files (NO versionar secretos) ---
+env/*.env
+env/.active.env
+.env
+.env.*
+# permitir plantillas
+!env/*.example
+!.env.example
+
+node_modules/
