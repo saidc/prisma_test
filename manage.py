@@ -64,7 +64,7 @@ def up(build: bool) -> None:
   print(" - Studio:      python3 manage.py studio")
 
   print("\n=== Paso 2 - Ver estado ===")
-  _run(compose_cmd(["ps"]))
+  _run(compose_cmd(["ps"]), "Estado de los servicios")
   print("\nEndpoints:")
   print(" - API health:  http://localhost:${APP_PORT}/health")
   print(" - Users:       http://localhost:${APP_PORT}/users")
