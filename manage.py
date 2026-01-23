@@ -103,8 +103,8 @@ def main():
   parser = argparse.ArgumentParser(description="Gestor del proyecto Prisma + Docker.")
   sub = parser.add_subparsers(dest="cmd", required=True)
 
-  up = sub.add_parser("up", help="Levanta el stack (api+db).")
-  up.add_argument("--build", action="store_true", help="Build images")
+  p_up = sub.add_parser("up", help="Levanta el stack (api+db).")
+  p_up.add_argument("--build", action="store_true", help="Build images")
 
   p_down = sub.add_parser("down", help="Baja el stack.")
   p_down.add_argument("--volumes", action="store_true", help="También elimina volúmenes (-v).")
