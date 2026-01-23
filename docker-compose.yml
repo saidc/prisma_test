@@ -4,9 +4,9 @@ services:
     container_name: prisma_basic_db
     restart: unless-stopped
     environment:
-      POSTGRES_DB: ${POSTGRES_DB:-app}
       POSTGRES_USER: ${POSTGRES_USER:-app}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-app}
+      POSTGRES_DB: ${POSTGRES_DB:-app}
     ports:
       - "${POSTGRES_PORT:-5432}:5432"
     volumes:
@@ -14,46 +14,43 @@ services:
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-app} -d ${POSTGRES_DB:-app}"]
       interval: 5s
-      timeout: 2s
-      retries: 20
-    networks:
-      - prisma-network
+      timeout: 5s
+      retries: 10
 
   api:
     build:
       context: .
       dockerfile: Dockerfile
+    image: prisma_basic_api
     container_name: prisma_basic_api
     restart: unless-stopped
+    env_file:
+      - .env
     environment:
-      PORT: 3000
-      DATABASE_URL: ${DATABASE_URL}
+      # ensure server binds to all interfaces inside container
+      HOST: 0.0.0.0
+      PORT: ${APP_PORT:-3000}
     ports:
       - "${APP_PORT:-3000}:3000"
     depends_on:
       db:
         condition: service_healthy
-    networks:
-      - prisma-network
 
   studio:
-    image: node:22-alpine
-    working_dir: /usr/src/app
-    volumes:
-      - .:/usr/src/app
-    command: sh -lc "npm install && npx prisma studio --port 5555 --browser none"
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: prisma_basic_studio
+    container_name: prisma_basic_studio
+    restart: unless-stopped
+    env_file:
+      - .env
+    command: ["sh", "-lc", "npm run studio"]
     ports:
       - "${STUDIO_PORT:-5555}:5555"
-    environment:
-      DATABASE_URL: ${DATABASE_URL}
     depends_on:
       db:
         condition: service_healthy
-    networks:
-      - prisma-network
-
-networks:
-  prisma-network:
 
 volumes:
   postgres_data:

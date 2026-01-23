@@ -1,32 +1,27 @@
-# Prisma + Docker (Node/Express + PostgreSQL)
+# prisma-docker-basic (Prisma 7 + Docker + Express + Postgres)
 
-Proyecto base para:
-- API Node.js/Express
-- Prisma ORM
-- PostgreSQL
-- Docker Compose (API + DB + Prisma Studio)
-
-Incluye CRUD completo de `User` y una migración inicial (ver `prisma/migrations`). Al levantar el stack, el contenedor ejecuta:
-
-- `prisma migrate deploy`
-- `prisma generate`
-- `node index.js`
+Proyecto base para levantar una API Express con Prisma ORM y PostgreSQL en Docker Compose,
+incluyendo Prisma Studio y un CRUD de `User`.
 
 ## Requisitos
-- Docker + Docker Compose
-- Puertos libres: 3000 (API), 5432 (Postgres), 5555 (Studio)
+- Docker + Docker Compose v2
+- Python 3 (solo si quieres usar `manage.py`)
 
-## 1) Variables de entorno
+## Arranque rápido
+
 ```bash
 cp .env.example .env
+docker compose up -d --build
+docker compose logs -f api
 ```
 
-## 2) Levantar
-```bash
-python3 manage.py up --build
-```
+Health:
+- http://localhost:3000/health
 
-## 3) Probar CRUD
+Prisma Studio:
+- http://localhost:5555
+
+## CRUD de User (cURL)
 
 Crear:
 ```bash
@@ -52,25 +47,16 @@ Eliminar:
 curl -X DELETE http://localhost:3000/users/1
 ```
 
-## 4) Prisma Studio
+## Bajar
 ```bash
-python3 manage.py studio
+docker compose down
 ```
 
-Abrir: `http://localhost:5555`
-
-## 5) Bajar / limpiar
-Bajar:
+Borrar datos (volumen):
 ```bash
-python3 manage.py down
+docker compose down -v
 ```
 
-Bajar y borrar datos:
-```bash
-python3 manage.py down --volumes
-```
-
-Reset total:
-```bash
-python3 manage.py nuke
-```
+## Notas Prisma 7
+- En Prisma 7.3, `datasource.url` ya **no** se define en `schema.prisma`.
+- La URL de conexión se define en `prisma.config.ts` (datasource.url).

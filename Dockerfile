@@ -1,5 +1,6 @@
 FROM node:22-alpine
 
+# Commonly needed by Node + crypto/TLS libs in Alpine environments
 RUN apk add --no-cache openssl
 
 WORKDIR /usr/src/app
@@ -11,4 +12,5 @@ COPY . .
 
 EXPOSE 3000
 
-CMD ["sh", "-c", "npm run db:deploy && npm run start"]
+# Run migrations (deploy) + generate, then start API
+CMD ["sh", "-lc", "npm run db:deploy && npm run start"]
