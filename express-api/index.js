@@ -1,11 +1,29 @@
-const express = require('express')
-const app = express()
-const port = 3000
+const express = require("express");
+const { PrismaClient } = require("./generated/prisma_client/client");
+const { PrismaPg } = require("@prisma/adapter-pg");
 
-app.get('/', (req, res) => {
-  res.send('Hello World from Docker!')
-})
+const adapter = new PrismaPg({
+  connectionString: process.env.DATABASE_URL,
+});
 
-app.listen(port, () => {
-  console.log(`Example app listening on port ${port}`)
-})
+const app = express();
+const prisma = new PrismaClient({
+  adapter,
+});
+app.use(express.json());
+
+// Get all users
+app.get("/", async (req, res) => {
+  const userCount = await prisma.user.count();
+  res.json(
+    userCount == 0
+      ? "No users have been added yet."
+      : "Some users have been added to the database."
+  );
+});
+
+const PORT = 3000;
+
+app.listen(PORT, () => {
+  console.log(`Server is running on http://localhost:${PORT}`);
+});

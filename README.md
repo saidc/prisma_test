@@ -9,6 +9,12 @@ incluyendo Prisma Studio y un CRUD de `User`.
 
 ## Arranque rápido
 
+
+1) primer comando 
+
+npx prisma migrate dev --name init --schema=./prisma/schema.prisma
+
+
 ```bash
 cp .env.example .env
 docker compose up -d --build

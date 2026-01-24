@@ -1,0 +1,36 @@
+datasource db {
+  provider = "postgresql"
+}
+
+generator client {
+  provider = "prisma-client-js"
+  output = "../generated/prisma_client"
+}
+
+enum UserStatus {
+  active
+  inactive
+  blocked
+  deleted
+}
+
+model User {
+  id           Int      @id @default(autoincrement())
+  username     String   @unique @db.VarChar(255)
+  email        String   @unique @db.VarChar(255)
+  passwordHash String   @map("password_hash") @db.VarChar(255)
+  displayName  String?  @map("display_name") @db.VarChar(255)
+  status       UserStatus @default(inactive)
+  lastSeen     DateTime @default(now()) @map("last_seen")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  emailVerified Boolean @default(false)
+  emailVerifiedAt DateTime? 
+  
+  @@index([email])
+  @@index([username])
+  @@index([status])
+  @@index([lastSeen])
+  @@map("users")
+}
