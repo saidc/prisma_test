@@ -3,18 +3,19 @@ services:
     image: postgres:15
     container_name: postgresdb
     restart: always
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
     environment:
       POSTGRES_USER: usuario
       POSTGRES_PASSWORD: minafro123
       POSTGRES_DB: bd_minafro
     ports:
       - "5432:5432"
-
   express-api:
     build:
-      context: /express-api
+      context: .
     container_name: express-api
-    reset: always
+    restart: always
     ports:
       - "3000:3000"
       - "5555:5555"
@@ -22,18 +23,16 @@ services:
       - postgresdb
     environment:
       DATABASE_URL: postgres://usuario:minafro123@postgresdb:5432/bd_minafro
-    volumes:
-      - /express-api:/app # Monta el directorio del proyecto en el contenedor
-      - node_modules:/app/node_modules # Monta node_modules para persistencia
+    #volumes:
+    #  - /express-api:/app # Monta el directorio del proyecto en el contenedor
+    #  - node_modules:/app/node_modules # Monta node_modules para persistencia
     command: |
-
       sh -c "
-        echo 'Esperando a que la base de datos esté lista...'
-        until nc -z -v -w30 postgresdb 5432
-        do
-          echo 'La base de datos no está lista, esperando...'
-          sleep 5
-        done
-        echo 'La base de datos está lista, iniciando la aplicación...'
-        node index.js
+        ls -la 
+        echo 'Comando test...'
+        npm install express --save
+        npm run dev
       "
+volumes:
+  postgres_data:
+    driver: local
