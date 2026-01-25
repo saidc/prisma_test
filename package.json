@@ -1,6 +1,31 @@
 {
+  "name": "prisma_test",
+  "version": "1.0.0",
+  "description": "Proyecto base para levantar una API Express con Prisma ORM y PostgreSQL en Docker Compose, incluyendo Prisma Studio y un CRUD de `User`.",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "dev": "node index.js",
+    "db:deploy": "npx prisma migrate deploy && npx prisma generate"
+  },
+  "keywords": [],
+  "author": "saidc", 
+  "license": "ISC",
   "devDependencies": {
-    "@prisma/config": "^7.3.0",
-    "dotenv": "^17.2.3"
+    "@types/pg": "^8.16.0",
+    "prisma": "^7.3.0"
+  },
+  "dependencies": {
+    "@prisma/adapter-pg": "^7.3.0",
+    "@prisma/client": "^7.3.0",
+    "dotenv": "^17.2.3",
+    "express": "^5.2.1",
+    "pg": "^8.17.2",
+    "bcryptjs": "^2.4.3",
+    "cors":"^2.8.5",
+    "express-session": "^1.18.2",
+    "ejs": "3.1.10",
+    "cookie-parser": "1.4.7",
+    "morgan": "1.10.1"
   }
 }

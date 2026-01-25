@@ -5,26 +5,15 @@ FROM node:24-alpine
 WORKDIR /app
 
 COPY express-api .
-# COPY package*.json ./
 
-RUN npm install
+COPY package.json package-lock.json ./
 
-# copia el archivo package.json al directorio de trabajo
-#RUN if [ ! -f package.json ]; then npm init -y; fi
+RUN npm ci
+#RUN npm install
 
-# instala las dependencias necesarias
-#RUN npm install express express-session http-errors
-# instala dependencias adicionales
-#RUN npm install ejs dotenv cookie-parser bcrypt morgan pg
-# instala Prisma y el cliente de Prisma
-#RUN npm install prisma @prisma/client
+#ENV DATABASE_URL=postgresql://postgres:prisma@localhost:5432/postgres?schema=public
 
-ENV DATABASE_URL=postgres://usuario:minafro123@postgresdb:5432/bd_minafro
-# expone el puerto 3000 para que pueda ser accedido desde fuera del contenedor
 EXPOSE 3000
 
-# comando para iniciar la aplicación
-CMD ["npm", "run", "dev"]
-#CMD ["node", "index.js"]
-#CMD ["node", "app/index.js"]  
-
+CMD ["sh", "-c", "npm run db:deploy && npm run dev"]
+#CMD ["npm", "run", "dev"]

@@ -1,12 +1,13 @@
 version: '3.7'
+
 services:
   postgres:
     image: postgres:15
     restart: always
     environment:
-      - POSTGRES_DB=bd_minafro
-      - POSTGRES_USER=usuario
-      - POSTGRES_PASSWORD=minafro123
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=prisma
     ports:
       - "5432:5432"
     networks:
