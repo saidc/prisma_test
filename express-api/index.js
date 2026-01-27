@@ -7,7 +7,7 @@ const adapter = new PrismaPg({
 });
 
 const app = express();
-const prisma = new PrismaClient({
+const prisma = new PrismaClient({ 
   adapter,
 });
 app.use(express.json());
@@ -18,7 +18,7 @@ app.get("/", async (req, res) => {
   res.json(
     userCount == 0
       ? "No users have been added yet."
-      : "Some users have been added to the database."
+      : `Some users have been added to the database. ${userCount} user(s) total.`
   );
 });
 

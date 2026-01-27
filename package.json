@@ -6,7 +6,12 @@
   "type": "module",
   "scripts": {
     "dev": "node index.js",
-    "db:deploy": "npx prisma migrate deploy && npx prisma generate"
+    "db:deploy": "npx prisma migrate deploy && npx prisma generate",
+    "db:seed": "npx prisma db seed",
+    "db:bootstrap": "npm run db:deploy && npm run db:seed"
+  },
+  "prisma": {
+    "seed": "node prisma/seed.js"
   },
   "keywords": [],
   "author": "saidc", 

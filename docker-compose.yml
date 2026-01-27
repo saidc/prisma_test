@@ -1,46 +1,27 @@
 services:
   postgres:
     image: postgres:15
+    hostname: postgres
+    container_name: postgres
     restart: always
     environment:
-      - POSTGRES_DB=bd_minafro
-      - POSTGRES_USER=usuario
-      - POSTGRES_PASSWORD=minafro123
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=prisma
     ports:
       - "5432:5432"
     networks:
       - prisma-network
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U prisma -d postgres"]
+      test: ["CMD-SHELL", "pg_isready -U postgres -d postgres"]
       interval: 5s
       timeout: 2s
       retries: 20
     volumes:
       - postgres_data:/var/lib/postgresql/data
     command: postgres -c listen_addresses='*'
-    logging:
-      options:
-        max-size: "10m"
-        max-file: "3"
 
-  # ------------------------
-  # Prisma Migration Service (one-time)
-  # ------------------------
-  migrate:
-    container_name: migrate
-    build:
-      context: .
-    command: |
-      sh -c "
-        npx prisma migrate deploy && npx prisma db seed
-      "
-    env_file:
-      - ./.env
-    depends_on:
-      postgres:
-        condition: service_healthy
-    restart: "no"
-
+    
   # ------------------------
   # Express API Server
   # ------------------------
@@ -48,25 +29,23 @@ services:
     container_name: express-api
     build:
       context: .
-    restart: unless-stopped
+      dockerfile: Dockerfile
     ports:
       - "3000:3000"
-      - "5555:5555"
+    stdin_open: true
+    tty: true
     depends_on:
-      - postgres
-    environment:
-      DATABASE_URL: postgres://usuario:minafro123@postgres:5432/bd_minafro
-    #volumes:
-    #  - /express-api:/app # Monta el directorio del proyecto en el contenedor
-    #  - node_modules:/app/node_modules # Monta node_modules para persistencia
-    #command: |
-    #  sh -c "
-    #    ls -la 
-    #    echo 'Comando test...'
-    #  "
-    
+      postgres:
+        condition: service_healthy
+    env_file:
+      - .env
+    networks:
+      - prisma-network
+
 networks:
-  prisma-network:
+  prisma-network: {}
 
 volumes:
   postgres_data:
+    external: true
+    name: prisma_postgres_data
