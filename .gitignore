@@ -13,10 +13,9 @@ env/.active.env
 !.env.example
 
 node_modules/
-/src/generated/prisma
 
 package-lock.json
-/generated
-/generated/prisma
-/prisma/migrations/
-/prisma/schema.prisma.test
+app/generated
+app/generated/prisma
+app/prisma/migrations/
+app/prisma/schema.prisma.test

@@ -54,7 +54,7 @@ Este repo usa **dos** compose para separar el bootstrap:
 
 Al clonar, el repo debe contener como mínimo (y **solo** esto en la raíz; el script puede advertir si ve extras):
 
-- `express-api/` (código de la API)
+- `app/` (código de la API)
 - `prisma/` (schema + seed + migrations)
 - `scripts/setup.sh`
 - `docker-compose.postgres.yml`

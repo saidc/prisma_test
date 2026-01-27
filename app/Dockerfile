@@ -5,18 +5,19 @@ FROM node:24-alpine
 WORKDIR /app
 
 # Copia primero manifest para cacheo de dependencias
-COPY package.json ../package-lock.json ./
+COPY package*.json ./
 
 # Copia prisma + config (necesarios para migraciones)
 COPY prisma.config.ts ./
 COPY prisma ./prisma
+COPY generated ./generated
 
-COPY .env ./
+#COPY .env ./
 
 # Copia el resto del código de la aplicación
-COPY express-api ./
-
-COPY generated ./generated
+COPY public ./public
+COPY src ./src
+COPY  ./views ./views
 
 
 RUN npm ci

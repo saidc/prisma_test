@@ -25,11 +25,11 @@ services:
   # ------------------------
   # Express API Server
   # ------------------------
-  express-api:
-    container_name: express-api
+  app:
+    container_name: app
     build:
-      context: .
-      dockerfile: express-api/Dockerfile
+      context: ./app
+      dockerfile: Dockerfile
     ports:
       - "3000:3000"
     stdin_open: true
