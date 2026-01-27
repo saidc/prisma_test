@@ -19,3 +19,4 @@ package-lock.json
 /generated
 /generated/prisma
 /prisma/migrations/
+/prisma/schema.prisma.test

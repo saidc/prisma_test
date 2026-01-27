@@ -53,7 +53,6 @@ async function main() {
       username: "alice",
       email: "alice@example.com",
       passwordHash: await hashPassword("password123"),
-      displayName: "Alice Smith",
       status: "active",
     },
   });
@@ -65,7 +64,6 @@ async function main() {
       username: "bob",
       email: "bob@example.com",
       passwordHash: await hashPassword("password123"),
-      displayName: "Bob Johnson",
       status: "active",
     },
   });
@@ -77,7 +75,6 @@ async function main() {
       username: "charlie",
       email: "charlie@example.com",
       passwordHash: await hashPassword("password123"),
-      displayName: "Charlie Brown",
       status: "active",
     },
   });
@@ -89,7 +86,6 @@ async function main() {
       username: "diana",
       email: "diana@example.com",
       passwordHash: await hashPassword("password123"),
-      displayName: "Diana Prince",
       status: "active",
     },
   });

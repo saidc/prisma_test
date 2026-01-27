@@ -43,7 +43,7 @@ req_paths=(
   "docker-compose.postgres.yml"
   "docker-compose.yml"
   "prisma.config.ts"
-  "Dockerfile"
+  "express-api/Dockerfile"
   "package.json"
   ".env"
 )

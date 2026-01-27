@@ -29,7 +29,7 @@ services:
     container_name: express-api
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: express-api/Dockerfile
     ports:
       - "3000:3000"
     stdin_open: true

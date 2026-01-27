@@ -4,17 +4,20 @@ FROM node:24-alpine
 # establece el directorio de trabajo dentro del contenedor
 WORKDIR /app
 
-COPY express-api .
+# Copia primero manifest para cacheo de dependencias
+COPY package.json ../package-lock.json ./
 
+# Copia prisma + config (necesarios para migraciones)
+COPY prisma.config.ts ./
 COPY prisma ./prisma
+
+COPY .env ./
+
+# Copia el resto del código de la aplicación
+COPY express-api ./
 
 COPY generated ./generated
 
-COPY package.json package-lock.json ./
-
-COPY prisma.config.ts ./
-
-COPY .env ./
 
 RUN npm ci
 #RUN npm install
